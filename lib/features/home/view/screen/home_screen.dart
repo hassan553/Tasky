@@ -81,19 +81,29 @@ class HomeScreen extends StatelessWidget {
                         const HomeTabBarWidget(),
                         const SizedBox(height: 12),
                         Expanded(
-                          child: ListView.builder(
-                            controller: cubit.scrollController,
-                            itemCount: cubit.tasks.length,
-                            itemBuilder: (context, index) {
-                              return InkWell(
-                                onTap: () {
-                                  context.navigateToPage(AppPages.taskDetails,
-                                      arguments: cubit.tasks[index]);
-                                },
-                                child: TaskItemCard(task: cubit.tasks[index]),
-                              );
-                            },
-                          ),
+                          child: cubit
+                                  .getSelectedTasks(cubit.currentIndex)
+                                  .isEmpty
+                              ? const Center(child: Text('No Tasks'))
+                              : ListView.builder(
+                                  controller: cubit.scrollController,
+                                  itemCount: cubit
+                                      .getSelectedTasks(cubit.currentIndex)
+                                      .length,
+                                  itemBuilder: (context, index) {
+                                    return InkWell(
+                                      onTap: () {
+                                        context.navigateToPage(
+                                            AppPages.taskDetails,
+                                            arguments: cubit.getSelectedTasks(
+                                                cubit.currentIndex)[index]);
+                                      },
+                                      child: TaskItemCard(
+                                          task: cubit.getSelectedTasks(
+                                              cubit.currentIndex)[index]),
+                                    );
+                                  },
+                                ),
                         )
                       ],
                     ),
@@ -129,16 +139,9 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class HomeTabBarWidget extends StatefulWidget {
+class HomeTabBarWidget extends StatelessWidget {
   const HomeTabBarWidget({super.key});
 
-  @override
-  State<HomeTabBarWidget> createState() => _HomeTabBarWidgetState();
-}
-
-class _HomeTabBarWidgetState extends State<HomeTabBarWidget> {
-  int currentIndex = 0;
-  List<String> titles = ['All', 'Inpogress', 'Waiting', 'Finished'];
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -147,23 +150,21 @@ class _HomeTabBarWidgetState extends State<HomeTabBarWidget> {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              setState(() {
-                currentIndex = index;
-              });
+              context.read<HomeCubit>().changeIndex(index);
             },
             child: Container(
               margin: const EdgeInsetsDirectional.only(end: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                  color: currentIndex == index
+                  color: context.read<HomeCubit>().currentIndex == index
                       ? AppColors.primaryColor
                       : const Color(0xffF0ECFF),
                   borderRadius: BorderRadius.circular(20)),
               child: Center(
                 child: Text(
-                  titles[index],
+                  context.read<HomeCubit>().titles[index],
                   style: context.f15600!.copyWith(
-                      color: currentIndex == index
+                      color: context.read<HomeCubit>().currentIndex == index
                           ? AppColors.whiteColor
                           : AppColors.bgGrey),
                 ),
@@ -171,7 +172,7 @@ class _HomeTabBarWidgetState extends State<HomeTabBarWidget> {
             ),
           );
         },
-        itemCount: titles.length,
+        itemCount: context.read<HomeCubit>().titles.length,
         scrollDirection: Axis.horizontal,
       ),
     );

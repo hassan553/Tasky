@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
-import 'package:tt/core/localization/app_strings.dart';
 import 'package:tt/core/models/errors/exceptions.dart';
 import 'package:tt/core/services/network_service/api_service.dart';
 import 'package:dio/src/multipart_file.dart' as multipart_file;
@@ -37,7 +36,7 @@ class AddTaskRepo {
     } on PrimaryServerException catch (e) {
       return left(e.message);
     } catch (e) {
-      return left(AppStrings.processFailed);
+      return left('Process Failed');
     }
   }
 
@@ -59,7 +58,7 @@ class AddTaskRepo {
     } on PrimaryServerException catch (e) {
       return left(e.message);
     } catch (e) {
-      return left(AppStrings.processFailed);
+      return left('Process Failed');
     }
   }
 
@@ -74,7 +73,7 @@ class AddTaskRepo {
     } on PrimaryServerException catch (e) {
       return left(e.message);
     } catch (e) {
-      return left(AppStrings.processFailed);
+      return left('Process Failed');
     }
   }
 
@@ -108,7 +107,7 @@ class AddTaskRepo {
     } on PrimaryServerException catch (e) {
       return left(e.message);
     } catch (e) {
-      return left(AppStrings.processFailed);
+      return left('Process Failed');
     }
   }
 }

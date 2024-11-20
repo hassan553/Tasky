@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:tt/core/localization/app_strings.dart';
 import 'package:tt/core/models/errors/exceptions.dart';
 import 'package:tt/core/services/network_service/api_service.dart';
 import 'package:tt/core/services/network_service/endpoints.dart';
@@ -22,7 +21,7 @@ class HomeRepo {
     } on PrimaryServerException catch (e) {
       return left(e.message);
     } catch (e) {
-      return left(AppStrings.processFailed);
+      return left('Process Failed');
     }
   }
 
@@ -38,7 +37,7 @@ class HomeRepo {
     } on PrimaryServerException catch (e) {
       return left(e.message);
     } catch (e) {
-      return left(AppStrings.processFailed);
+      return left('Process Failed');
     }
   }
 }

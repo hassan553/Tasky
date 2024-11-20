@@ -13,8 +13,31 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit({required this.repo}) : super(HomeInitial()) {
     scrollController.addListener(addListen);
   }
- static HomeCubit get(context) => BlocProvider.of(context);
-  List<TaskModel> tasks = [];
+  static HomeCubit get(context) => BlocProvider.of(context);
+  List<TaskModel> allTasks = [];
+  List<TaskModel> inProgressTasks = [];
+  List<TaskModel> completedTasks = [];
+  List<TaskModel> waitingTasks = [];
+  List<TaskModel> getSelectedTasks(int index) {
+    if (index == 0) {
+      return allTasks;
+    } else if (index == 1) {
+      return inProgressTasks;
+    } else if (index == 2) {
+      return completedTasks;
+    } else {
+      return waitingTasks;
+    }
+  }
+
+  int currentIndex = 0;
+
+  void changeIndex(int index) {
+    emit(ChangeLoadingTaskState());
+    currentIndex = index;
+    emit(ChangeIndexState());
+  }
+
   int currentPage = 1;
   Future<void> getAllTask([bool? isPagination]) async {
     if (isPagination == null) {
@@ -28,11 +51,23 @@ class HomeCubit extends Cubit<HomeState> {
       (l) => emit(GetAllTaskFailed(l)),
       (r) {
         currentPage++;
-        tasks.addAll(r);
-        print(currentPage++);
+        allTasks.addAll(r);
+        assignTasks();
         emit(GetAllTaskSuccess(r));
       },
     );
+  }
+
+  List<String> titles = ['All', 'Inpogress', 'Waiting', 'Finished'];
+
+  void assignTasks() {
+    inProgressTasks =
+        allTasks.where((element) => element.status == 'inProgress').toList();
+    completedTasks =
+        allTasks.where((element) => element.status == 'completed').toList();
+    waitingTasks =
+        allTasks.where((element) => element.status == 'waiting').toList();
+    emit(ChangeLoadingTaskState());
   }
 
   ScrollController scrollController = ScrollController();
@@ -49,7 +84,7 @@ class HomeCubit extends Cubit<HomeState> {
     result.fold(
       (l) => emit(DeleteTaskFailed(l)),
       (r) {
-       // tasks.removeWhere((element) => element.sId == taskId.toString());
+        // tasks.removeWhere((element) => element.sId == taskId.toString());
         emit(DeleteTaskSuccess());
       },
     );

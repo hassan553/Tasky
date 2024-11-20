@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/src/multipart_file.dart' as multipart_file;
 import 'package:tt/core/extension/navigation_extension.dart';
 
-import 'package:tt/core/localization/app_strings.dart';
+
 import 'package:tt/core/models/errors/exceptions.dart';
 import 'package:tt/core/routes/app_pages.dart';
 import 'package:tt/core/services/cache/cash_helper.dart';
@@ -340,7 +340,7 @@ extension on DioHelper {
           throw PrimaryServerException(
               code: 100,
               error: e.toString(),
-              message: AppStrings.connectionError);
+              message: 'Connection Error');
       }
     } catch (e) {
       PrimaryServerException exception = e as PrimaryServerException;
