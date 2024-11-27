@@ -28,8 +28,8 @@ void main() async {
       supportedLocales: const [Locale('en', 'US'), Locale('ar', 'EG')],
       path: 'assets/translations',
       assetLoader: const CodegenLoader(),
-      fallbackLocale: const Locale('ar', 'EG'),
-      startLocale: const Locale('ar', 'EG'),
+      fallbackLocale: const Locale('en', 'US'),
+      startLocale: const Locale('en', 'US'),
       child: DevicePreview(
         enabled: false,
         builder: (context) => const MyApp(),

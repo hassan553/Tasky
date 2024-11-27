@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tt/components/custom_image_handler.dart';
+import 'package:tt/core/extension/navigation_extension.dart';
+import 'package:tt/core/routes/app_pages.dart';
 import 'package:tt/features/home/logic/home_cubit.dart';
 import 'package:tt/features/home/view/widget/show_info_bubble_dailog.dart';
 
@@ -111,14 +113,37 @@ class TaskItemCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          InkWell(
-              onTap: () {
+          PopupMenuButton<String>(
+            initialValue: 'Edit Task',
+            onSelected: (String item) {
+              if (item == 'Edit Task') {
+                context.navigateToPage(AppPages.addTask, arguments: task?.sId);
+              } else {
                 showDialog(
                   context: context,
                   builder: (context) => CustomInfoDialog(taskId: task!.sId!),
                 );
-              },
-              child: Icon(Icons.more_vert_sharp, size: 25.sp))
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'Edit Task',
+                child: Text('Edit Task'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Delete Task',
+                child: Text('Delete Task'),
+              ),
+            ],
+          )
+          // InkWell(
+          //     onTap: () {
+          //       showDialog(
+          //         context: context,
+          //         builder: (context) => CustomInfoDialog(taskId: task!.sId!),
+          //       );
+          //     },
+          //     child: Icon(Icons.more_vert_sharp, size: 25.sp))
         ],
       ),
     );
