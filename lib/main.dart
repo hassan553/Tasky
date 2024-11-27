@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tt/core/services/setup/getIt.dart';
+import 'package:tt/features/add_task/data/repo/add_task_repo.dart';
+import 'package:tt/features/add_task/logic/add_task_cubit.dart';
 import 'package:tt/features/home/data/repo/home_repo.dart';
 import 'package:tt/features/home/logic/home_cubit.dart';
 import 'package:tt/generated/codegen_loader.g.dart';
@@ -46,9 +48,15 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
         designSize: const Size(360, 690),
         builder: (_, child) {
-          return BlocProvider(
-            create: (context) =>
-                HomeCubit(repo: getIt<HomeRepo>())..getAllTask(),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                  create: (context) =>
+                      HomeCubit(repo: getIt<HomeRepo>())..getAllTask()),
+              BlocProvider(
+                  create: (context) =>
+                      AddTaskCubit(addTaskRepo: getIt<AddTaskRepo>()))
+            ],
             child: MaterialApp(
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,

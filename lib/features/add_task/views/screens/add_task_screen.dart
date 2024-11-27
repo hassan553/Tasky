@@ -9,10 +9,9 @@ import 'package:tt/features/add_task/logic/add_task_cubit.dart';
 import '../../../../components/custom_button.dart';
 import '../../../../components/custom_drop_down_menu.dart';
 import '../../../../components/text_field_component.dart';
-import '../../../../core/services/setup/getIt.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_validation_functions.dart';
-import '../../data/repo/add_task_repo.dart';
+import '../../../home/data/model/task_model.dart';
 import '../widgets/add_image_widget.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -28,6 +27,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   var descriptionController = TextEditingController();
   var dateController = TextEditingController();
   var priorityController = TextEditingController(text: 'low');
+
   @override
   void dispose() {
     titleController.dispose();
@@ -37,103 +37,123 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     super.dispose();
   }
 
+  getInitData(TaskModel taskModel) {
+    titleController.text = taskModel.title ?? "";
+    descriptionController.text = taskModel.desc ?? "";
+    dateController.text = taskModel.createdAt ?? '';
+    priorityController.text = taskModel.priority ?? '';
+    BlocProvider.of<AddTaskCubit>(context).image = taskModel.image ?? '';
+  }
+
+  bool isInit = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (isInit) {
+      final taskModel =
+          ModalRoute.of(context)?.settings.arguments as TaskModel?;
+      if (taskModel != null) {
+        getInitData(taskModel);
+      }
+      isInit = false; 
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Task', style: context.f16700),
       ),
-      body: BlocProvider(
-        create: (context) => AddTaskCubit(addTaskRepo: getIt<AddTaskRepo>()),
-        child: Form(
-          key: formKey,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            children: [
-              const SizedBox(height: 10),
-              BlocBuilder<AddTaskCubit, AddTaskState>(
-                builder: (context, state) {
-                  return DottedBorderIcon(
-                    size: 30.w,
-                    icon: AppImages.addImage,
-                    image: BlocProvider.of<AddTaskCubit>(context).image,
-                    onTap: () {
-                      BlocProvider.of<AddTaskCubit>(context).takeTaskImage();
-                    },
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFieldComponent(
-                title: 'Task Title',
-                hint: 'Write task title',
-                keyboardType: TextInputType.name,
-                controller: titleController,
-                validator: (v) =>
-                    AppValidationFunctions.stringValidationFunction(v, 'title'),
-              ),
-              const SizedBox(height: 20),
-              TextFieldComponent(
-                title: 'Task Description',
-                hint: 'Write task description',
-                keyboardType: TextInputType.name,
-                controller: descriptionController,
-                maxlines: 4,
-                validator: (v) =>
-                    AppValidationFunctions.stringValidationFunction(
-                        v, 'description'),
-              ),
-              const SizedBox(height: 20),
-              TextFieldComponent(
-                title: 'Task time',
-                hint: 'Write task time',
-                isReadOnly: true,
-                onPress: () async {
-                  var date = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(20100),
-                  );
-                  if (date != null) {
-                    dateController.text = dateFormat(date);
-                  }
-                },
-                controller: dateController,
-                validator: (v) =>
-                    AppValidationFunctions.stringValidationFunction(v, 'date'),
-              ),
-              const SizedBox(height: 30),
-              CustomDropdown(
-                onChanged: (p0) {
-                  priorityController.text = p0.toString();
-                },
-                initialValue: 'low',
-              ),
-              const SizedBox(height: 30),
-              BlocBuilder<AddTaskCubit, AddTaskState>(
-                builder: (context, state) {
-                  return state is AddTaskLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : CustomButton(
-                          text: 'Add Task',
-                          color: AppColors.whiteColor,
-                          onTap: () async {
-                            if (formKey.currentState!.validate()) {
-                              await BlocProvider.of<AddTaskCubit>(context)
-                                  .uploadImage(
-                                image: BlocProvider.of<AddTaskCubit>(context)
-                                    .image!,
-                                title: titleController.text,
-                                desc: descriptionController.text,
-                                priority: priorityController.text,
-                                dueDate: dateController.text,
-                              );
-                            }
-                          });
-                },
-              ),
-            ],
-          ),
+      body: Form(
+        key: formKey,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          children: [
+            const SizedBox(height: 10),
+            BlocBuilder<AddTaskCubit, AddTaskState>(
+              builder: (context, state) {
+                return DottedBorderIcon(
+                  size: 30.w,
+                  icon: AppImages.addImage,
+                  image: BlocProvider.of<AddTaskCubit>(context).image,
+                  onTap: () {
+                    BlocProvider.of<AddTaskCubit>(context).takeTaskImage();
+                  },
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+            TextFieldComponent(
+              title: 'Task Title',
+              hint: 'Write task title',
+              keyboardType: TextInputType.name,
+              controller: titleController,
+              validator: (v) =>
+                  AppValidationFunctions.stringValidationFunction(v, 'title'),
+            ),
+            const SizedBox(height: 20),
+            TextFieldComponent(
+              title: 'Task Description',
+              hint: 'Write task description',
+              keyboardType: TextInputType.name,
+              controller: descriptionController,
+              maxlines: 4,
+              validator: (v) => AppValidationFunctions.stringValidationFunction(
+                  v, 'description'),
+            ),
+            const SizedBox(height: 20),
+            TextFieldComponent(
+              title: 'Task time',
+              hint: 'Write task time',
+              isReadOnly: true,
+              onPress: () async {
+                var date = await showDatePicker(
+                  context: context,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(20100),
+                );
+                if (date != null) {
+                  dateController.text = dateFormat(date);
+                }
+              },
+              controller: dateController,
+              validator: (v) =>
+                  AppValidationFunctions.stringValidationFunction(v, 'date'),
+            ),
+            const SizedBox(height: 30),
+            CustomDropdown(
+              onChanged: (p0) {
+                priorityController.text = p0.toString();
+              },
+              initialValue: 'low',
+            ),
+            const SizedBox(height: 30),
+            BlocBuilder<AddTaskCubit, AddTaskState>(
+              builder: (context, state) {
+                return state is AddTaskLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : CustomButton(
+                        text: 'Add Task',
+                        color: AppColors.whiteColor,
+                        onTap: () async {
+                          if (formKey.currentState!.validate()) {
+                            await BlocProvider.of<AddTaskCubit>(context)
+                                .uploadImage(
+                              image:
+                                  BlocProvider.of<AddTaskCubit>(context).image!,
+                              title: titleController.text,
+                              desc: descriptionController.text,
+                              priority: priorityController.text,
+                              dueDate: dateController.text,
+                            );
+                          }
+                        });
+              },
+            ),
+          ],
         ),
       ),
     );

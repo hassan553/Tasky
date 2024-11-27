@@ -117,7 +117,7 @@ class TaskItemCard extends StatelessWidget {
             initialValue: 'Edit Task',
             onSelected: (String item) {
               if (item == 'Edit Task') {
-                context.navigateToPage(AppPages.addTask, arguments: task?.sId);
+                context.navigateToPage(AppPages.addTask, arguments: task);
               } else {
                 showDialog(
                   context: context,

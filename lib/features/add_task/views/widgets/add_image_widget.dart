@@ -36,11 +36,10 @@ class DottedBorderIcon extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: Center(
           child: image != null
-              ? Image.file(
-                  File(image!),
-                  fit: BoxFit.fill,
-                  height: 50.h,
-                )
+              ? Image.file(File(image!), fit: BoxFit.fill, height: 50.h,
+                  errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.error, color: Colors.red);
+                })
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
