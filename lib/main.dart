@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
               initialRoute:
                   CashHelper.sharedPreferences?.getString('token') != null
                       ? AppPages.home
-                      : AppPages.login,
+                      : AppPages.onboarding,
               routes: routes,
               navigatorKey: getIt<NavigationService>().navigatorKey,
             ),
