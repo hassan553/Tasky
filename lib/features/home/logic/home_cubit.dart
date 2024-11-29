@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:tt/components/custom_toast.dart';
 import 'package:tt/features/home/data/repo/home_repo.dart';
 
 import '../data/model/task_model.dart';
@@ -24,9 +25,9 @@ class HomeCubit extends Cubit<HomeState> {
     } else if (index == 1) {
       return inProgressTasks;
     } else if (index == 2) {
-      return completedTasks;
-    } else {
       return waitingTasks;
+    } else {
+      return completedTasks;
     }
   }
 
@@ -39,18 +40,20 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   int currentPage = 1;
-  Future<void> getAllTask([bool? isPagination]) async {
+  Future<void> getAllTask([bool? isPagination, int? page]) async {
     if (isPagination == null) {
       emit(GetAllTaskLoading());
     } else {
       emit(GetAllPaginationTaskLoading());
     }
 
-    final result = await repo.getAllTask(currentPage: currentPage);
+    final result = await repo.getAllTask(currentPage: page ?? currentPage);
     result.fold(
       (l) => emit(GetAllTaskFailed(l)),
       (r) {
-        currentPage++;
+        if (r.isNotEmpty && page == null) {
+          currentPage++;
+        }
         allTasks.addAll(r);
         assignTasks();
         emit(GetAllTaskSuccess(r));
@@ -82,9 +85,14 @@ class HomeCubit extends Cubit<HomeState> {
     emit(DeleteTaskLoading());
     final result = await repo.deleteTask(taskId: taskId);
     result.fold(
-      (l) => emit(DeleteTaskFailed(l)),
-      (r) {
-        // tasks.removeWhere((element) => element.sId == taskId.toString());
+      (l) async {
+        print(l);
+        showToast(msg: 'Delete task failed', isError: true);
+        emit(DeleteTaskFailed(l));
+      },
+      (r) async {
+        showToast(msg: 'Delete task successfully', isError: false);
+        await getAllTask();
         emit(DeleteTaskSuccess());
       },
     );

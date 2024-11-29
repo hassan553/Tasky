@@ -22,7 +22,7 @@ class LoadingPage extends StatelessWidget {
           child: BlocListener<ProfileCubit, ProfileState>(
             listener: (context, state) {
               if (state is GetUserProfileSuccess) {
-                context.navigateToPage(AppPages.home);
+                context.navigateToAndReplacement(AppPages.home);
               }
             },
             child: Column(

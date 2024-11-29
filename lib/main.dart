@@ -63,7 +63,10 @@ class MyApp extends StatelessWidget {
               locale: context.locale,
               debugShowCheckedModeBanner: false,
               title: 'Flutter Demo',
-              initialRoute: AppPages.login,
+              initialRoute:
+                  CashHelper.sharedPreferences?.getString('token') != null
+                      ? AppPages.home
+                      : AppPages.login,
               routes: routes,
               navigatorKey: getIt<NavigationService>().navigatorKey,
             ),

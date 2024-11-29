@@ -9,6 +9,7 @@ showToast({
       msg: msg,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.TOP,
+      
       timeInSecForIosWeb: 1,
       backgroundColor: isError ?? false ? Colors.red : Colors.green,
       textColor: Colors.white,

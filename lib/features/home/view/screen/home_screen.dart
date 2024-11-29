@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
         title: Text('Tasky', style: context.f24700),
         actions: [
           IconButton(
@@ -55,12 +56,13 @@ class HomeScreen extends StatelessWidget {
         },
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
+        //buildWhen: (previous, current) => previous != current,
         builder: (context, state) {
           var cubit = context.read<HomeCubit>();
-          if (state is GetAllTaskSuccess) {
+          if (cubit.allTasks.isNotEmpty) {
             return RefreshIndicator(
               onRefresh: () async {
-                await cubit.getAllTask();
+                await cubit.getAllTask(true, 1);
               },
               child: Padding(
                 padding: const EdgeInsets.all(20),
@@ -146,34 +148,39 @@ class HomeTabBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 40.h,
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              context.read<HomeCubit>().changeIndex(index);
-            },
-            child: Container(
-              margin: const EdgeInsetsDirectional.only(end: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                  color: context.read<HomeCubit>().currentIndex == index
-                      ? AppColors.primaryColor
-                      : const Color(0xffF0ECFF),
-                  borderRadius: BorderRadius.circular(20)),
-              child: Center(
-                child: Text(
-                  context.read<HomeCubit>().titles[index],
-                  style: context.f15600!.copyWith(
+      child: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          return ListView.builder(
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  context.read<HomeCubit>().changeIndex(index);
+                },
+                child: Container(
+                  margin: const EdgeInsetsDirectional.only(end: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
                       color: context.read<HomeCubit>().currentIndex == index
-                          ? AppColors.whiteColor
-                          : AppColors.bgGrey),
+                          ? AppColors.primaryColor
+                          : const Color(0xffF0ECFF),
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Center(
+                    child: Text(
+                      context.read<HomeCubit>().titles[index],
+                      style: context.f15600!.copyWith(
+                          color: context.read<HomeCubit>().currentIndex == index
+                              ? AppColors.whiteColor
+                              : AppColors.bgGrey),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
+            itemCount: context.read<HomeCubit>().titles.length,
+            scrollDirection: Axis.horizontal,
           );
         },
-        itemCount: context.read<HomeCubit>().titles.length,
-        scrollDirection: Axis.horizontal,
       ),
     );
   }
